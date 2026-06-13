@@ -12,11 +12,10 @@
 
 ;; Modüller.
 (load (strcat *mep-dir* "/modules/havalandirma/hva-load.lsp"))
-;; Gelecek modüller buraya eklenecek:
-;; (load (strcat *mep-dir* "/modules/su/su-load.lsp"))
-;; (load (strcat *mep-dir* "/modules/elektrik/elk-load.lsp"))
-;; (load (strcat *mep-dir* "/modules/yangin/yng-load.lsp"))
-;; (load (strcat *mep-dir* "/modules/isi/isi-load.lsp"))
+(load (strcat *mep-dir* "/modules/su/su-load.lsp"))
+(load (strcat *mep-dir* "/modules/yangin/yng-load.lsp"))
+(load (strcat *mep-dir* "/modules/elektrik/elk-load.lsp"))
+(load (strcat *mep-dir* "/modules/isi/isi-load.lsp"))
 
 (princ "\n=== MEP Paketi yuklendi. ===\n")
 (princ)

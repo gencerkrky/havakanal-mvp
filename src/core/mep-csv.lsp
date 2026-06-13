@@ -28,6 +28,11 @@
   out)
 
 ;; rows: assoc list listesi. cols: sembol listesi.
+;; UTF-8 BOM (EF BB BF) — Türkçe karakterlerin Excel'de bozulmaması için
+;; dosya başına yazılır. AutoLISP'te byte değerlerini chr ile üretiyoruz.
+(defun mep-csv-bom ()
+  (strcat (chr 239) (chr 187) (chr 191)))
+
 ;; Dönüş: T başarılı, nil hata. Hata mesajı komut satırına yazılır.
 (defun mep-csv-write (filepath rows cols / f)
   (setq f (open filepath "w"))
@@ -36,7 +41,7 @@
       (princ (strcat "\nHATA: CSV dosyasi acilamadi: " filepath))
       nil)
     (progn
-      (write-line (mep-csv-header cols) f)
+      (write-line (strcat (mep-csv-bom) (mep-csv-header cols)) f)
       (foreach r rows (write-line (mep-csv-row r cols) f))
       (close f)
       (princ (strcat "\nCSV yazildi: " filepath))
