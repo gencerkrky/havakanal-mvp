@@ -1,0 +1,13 @@
+# Autodesk referans PDF'i (repo'ya gerek yok, lokal kalsın)
+app-store-getting-started-guide.pdf
+
+# AutoCAD geçici/yedek dosyaları
+*.bak
+*.dwl
+*.dwl2
+*.sv$
+*.err
+
+# OS
+.DS_Store
+Thumbs.db
