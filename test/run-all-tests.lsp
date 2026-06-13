@@ -2,24 +2,28 @@
 ;; Kullanım (AutoCAD veya AutoLISP-uyumlu yorumlayıcı):
 ;;   (load "test/run-all-tests.lsp")
 ;; NOT: Sadece AutoCAD'den bağımsız saf çekirdek test edilir.
-;; CAD katmanı (hk-cad-read/write, hk-ui, hk-commands) AutoCAD'de elle doğrulanır.
+;; CAD katmanı (mep-cad, hva-commands) AutoCAD'de elle doğrulanır.
 
 (load "test/hk-test-framework.lsp")
 (setq *hk-test-pass* 0)
 (setq *hk-test-fail* 0)
 
-;; Saf kaynak modülleri
-(load "src/hk-standards.lsp")
-(load "src/hk-core-sizing.lsp")
-(load "src/hk-core-takeoff.lsp")
-(load "src/hk-rules.lsp")
-(load "src/hk-export-csv.lsp")
+;; --- Core (saf) ---
+(load "src/core/mep-units.lsp")
+(load "src/core/mep-csv.lsp")
 
-;; Saf testler
-(load "test/test-standards.lsp")
-(load "test/test-sizing.lsp")
-(load "test/test-takeoff.lsp")
-(load "test/test-rules.lsp")
-(load "test/test-export.lsp")
+;; --- Havalandırma (saf) ---
+(load "src/modules/havalandirma/hva-standards.lsp")
+(load "src/modules/havalandirma/hva-sizing.lsp")
+(load "src/modules/havalandirma/hva-takeoff.lsp")
+(load "src/modules/havalandirma/hva-rules.lsp")
+
+;; --- Testler ---
+(load "test/core/test-units.lsp")
+(load "test/core/test-csv.lsp")
+(load "test/havalandirma/test-standards.lsp")
+(load "test/havalandirma/test-sizing.lsp")
+(load "test/havalandirma/test-takeoff.lsp")
+(load "test/havalandirma/test-rules.lsp")
 
 (hk-test-summary)

@@ -1,90 +1,98 @@
-# HavaKanal MVP
+# MEP Eklenti Paketi
 
-AutoCAD için havalandırma (hava kanalı) **boyutlandırma + metraj** eklentisi (AutoLISP).
-Düz AutoCAD'de tek çizgi (polyline) ile çizen makine mühendisleri için.
+AutoCAD için **MEP (Mekanik–Elektrik–Tesisat)** eklenti paketi (AutoLISP).
+Düz AutoCAD'de çizen mühendislerin tekrarlayan işini (boyutlandırma, hesap, metraj, Excel raporu) otomatikleştirir.
 
-> Durum: MVP. Hesap formülleri mühendis testiyle doğrulanma aşamasında (bkz. [Doğrulama](#doğrulama)).
+> Durum: MVP. Şu an **Havalandırma** modülü çalışıyor. Mimari çok-modüllü kurulu; su/elektrik/yangın/ısı modülleri eklenecek.
 
-## Ne yapar?
+## Modüller
 
-İki komut:
-
-| Komut | İşlev |
-|-------|-------|
-| `HKBOYUT` | Polyline(leri) seç → debi (m³/h) + yöntem gir → dikdörtgen kanal boyutunu hesaplar, TS EN 1505 standardına yuvarlar, çizime etiketler |
-| `HKMETRAJ` | Polyline(leri) seç → boyut + uzunluktan yüzey alanı (m²) ve sac ağırlığı (kg) hesaplar → CSV'ye döker |
-
-**Cam kutu yaklaşımı:** Hesap "kara kutu" değil — hız (V), basınç kaybı (Pa/m ve mmSS/m), eşdeğer çap (De) ve en-boy oranı her zaman gösterilir. Sonucu kabul edebilir veya elle değiştirebilirsiniz (override).
-
-**Uyarılar:** En-boy oranı > 4:1, aşırı hız (uygulama tipine göre) gibi durumlarda sarı bayrak gösterir (engellemez).
+| Modül | Durum | Komutlar |
+|-------|-------|----------|
+| **Havalandırma** (hava kanalı boyutlandırma + metraj) | ✅ MVP | `HKBOYUT`, `HKMETRAJ` |
+| Su tesisatı | ⏳ planlı | — |
+| Elektrik tesisatı | ⏳ planlı | — |
+| Yangın tesisatı | ⏳ planlı | — |
+| Isı kaybı/kazancı hesabı | ⏳ planlı | — |
 
 ## Kurulum (AutoCAD)
 
-1. Bu depoyu indirin (GitHub'da **Code → Download ZIP** veya `git clone`).
-2. ZIP'i bir klasöre açın (örn. `C:\HavaKanal\`).
-3. AutoCAD'i açın.
-4. Komut satırına şunu yazın (yolu kendi klasörünüze göre düzeltin):
+1. Bu depoyu indirin (**Code → Download ZIP** veya `git clone`).
+2. ZIP'i bir klasöre açın (örn. `C:\MEP\`).
+3. AutoCAD'i açın, komut satırına şunu yazın (yolu kendinize göre düzeltin):
    ```
-   (load "C:/HavaKanal/src/hk-load.lsp")
+   (load "C:/MEP/src/mep-load.lsp")
    ```
-   > Windows yollarında `\` yerine `/` kullanın veya `\\` yazın.
-5. Şu mesajı görmelisiniz: `HavaKanal MVP yuklendi. Komutlar: HKBOYUT, HKMETRAJ`
-6. Artık `HKBOYUT` ve `HKMETRAJ` komutlarını kullanabilirsiniz.
+   > Windows yollarında `\` yerine `/` kullanın.
+4. `=== MEP Paketi yuklendi. ===` mesajını görmelisiniz. Tüm modüllerin komutları hazırdır.
 
-**Her açılışta otomatik yükleme** isterseniz: AutoCAD'de `APPLOAD` → **Startup Suite** → `src/hk-load.lsp` ekleyin.
+**Sadece bir modül** yüklemek isterseniz (örn. sadece havalandırma):
+```
+(load "C:/MEP/src/modules/havalandirma/hva-load.lsp")
+```
+Modül, çekirdeği (core) otomatik bulup yükler.
 
-## Kullanım
+**Her açılışta otomatik:** `APPLOAD` → **Startup Suite** → `src/mep-load.lsp` ekleyin.
 
-### HKBOYUT (boyutlandırma)
-1. `HKBOYUT` yazın.
-2. Kanal polyline'larını seçin.
-3. Yöntem seçin: **Surtunme** (eşit sürtünme, Pa/m hedefi) veya **Hiz** (sabit hız, m/s hedefi).
-4. Uygulama tipi: **Ofis / Konut / Endustri** (hız uyarı eşiği için).
-5. Debi Q (m³/h), hedef (Pa/m veya m/s) ve en-boy oranını girin.
-6. Sonucu inceleyin (cam kutu) → **Kabul** veya **Degistir**.
-7. Boyut çizime etiketlenir.
+## Havalandırma Modülü Kullanımı
+
+### HKBOYUT (kanal boyutlandırma)
+1. `HKBOYUT` → kanal polyline'larını seç.
+2. Yöntem: **Surtunme** (eşit sürtünme, Pa/m) veya **Hiz** (sabit hız, m/s).
+3. Uygulama: **Ofis / Konut / Endustri** (hız uyarı eşiği).
+4. Debi Q (m³/h), hedef ve en-boy oranını gir.
+5. Cam kutu sonucu (boyut + V + Pa/m + mmSS/m + De + uyarılar) → **Kabul** veya **Degistir**.
+6. Boyut çizime etiketlenir.
 
 ### HKMETRAJ (metraj)
-1. `HKMETRAJ` yazın.
-2. Polyline'ları seçin.
-3. Fitting fire yüzdesini girin (varsayılan %15).
-4. Her segment için boyutu girin (örn. `400x300`).
-5. CSV kayıt yerini seçin → metraj Excel'de açılır.
+1. `HKMETRAJ` → polyline'ları seç.
+2. Fitting fire % gir (varsayılan %15).
+3. Her segmentin boyutunu gir (örn. `400x300`).
+4. CSV kayıt yerini seç → Excel'de açılır.
 
-## Doğrulama
-
-Saf hesap çekirdeği (boyutlandırma, metraj, yuvarlama, kurallar) AutoCAD'den bağımsız test edilebilir:
-
-```
-(load "test/run-all-tests.lsp")
-```
-Sonuç: `=== SONUC: N PASS, 0 FAIL ===`
-
-> ⚠️ **Mühendis kabul testi gerekli:** Sürtünme katsayısı (`*hk-friction-k*`, `src/hk-core-sizing.lsp`) yaklaşık bir bağıntıdır. Gerçek ductulator/nomogram sonuçlarıyla karşılaştırılıp kalibre edilmelidir. Hız eşikleri ve sac kalınlığı tablosu da makine mühendisi onayı bekler.
+**Cam kutu yaklaşımı:** Hesap kara kutu değil — hız, basınç kaybı (Pa/m ve mmSS/m), eşdeğer çap, en-boy oranı görünür; sonuç override edilebilir.
 
 ## Mimari
 
 ```
 src/
-  hk-standards.lsp     TS EN 1505 kademeler, yuvarlama, sac kalınlığı, Pa↔mmSS, boyut parse
-  hk-core-sizing.lsp   Boyutlandırma (alan, eşdeğer çap, sabit hız, eşit sürtünme)
-  hk-core-takeoff.lsp  Metraj (yüzey alanı, ağırlık, fire %)
-  hk-rules.lsp         Uyarı kuralları
-  hk-export-csv.lsp    CSV yazma
-  hk-cad-read.lsp      AutoCAD okuma (uzunluk, seçim)   [AutoCAD gerekir]
-  hk-cad-write.lsp     AutoCAD yazma (etiket)            [AutoCAD gerekir]
-  hk-ui.lsp            Komut satırı etkileşimi
-  hk-commands.lsp      HKBOYUT, HKMETRAJ
-  hk-load.lsp          Yükleyici (giriş noktası)
-test/                  Saf çekirdek testleri
-docs/superpowers/      Tasarım (spec) ve uygulama planı
+  core/                      Domain-bağımsız ortak araçlar (tüm modüller paylaşır)
+    mep-units.lsp            birim dönüşümü (Pa<->mmSS)
+    mep-csv.lsp              CSV yazma
+    mep-ui.lsp               genel kullanıcı sorgusu
+    mep-cad.lsp              genel CAD I/O (uzunluk, seçim, metin)   [AutoCAD]
+    mep-core-load.lsp        core yükleyici
+  modules/
+    havalandirma/            Havalandırma modülü
+      hva-standards.lsp      TS EN 1505 kademe, sac kalınlığı, parse
+      hva-sizing.lsp         boyutlandırma
+      hva-takeoff.lsp        metraj
+      hva-rules.lsp          uyarı kuralları
+      hva-commands.lsp       HKBOYUT, HKMETRAJ + modül UI
+      hva-load.lsp           modül yükleyici (core'u garanti eder)
+  mep-load.lsp               ANA yükleyici (core + tüm modüller)
+test/                        Saf çekirdek testleri (core + havalandırma)
+docs/superpowers/            Tasarım (spec) ve uygulama planları
 ```
 
-## Kapsam (MVP) ve sonraki sürümler
+**Yeni modül eklemek:** `modules/<disiplin>/` klasörü aç, `<önek>-*.lsp` dosyalarını ve `<önek>-load.lsp` yükleyicisini yaz, `mep-load.lsp`'ye bir `(load ...)` satırı ekle. Core'u (CSV, UI, birim, CAD) hazır kullanırsın.
 
-**Bu sürüm:** Düz dikdörtgen kanal, eşit sürtünme / sabit hız, standart yuvarlama, metraj, CSV, uyarılar.
+## Doğrulama / Test
 
-**Sonraki (v2):** Dirsek/T/redüksiyon fitting hesabı, yuvarlak/spiral kanal, tüm-ağ basınç toplama, .xlsx çıktı, lisanslama, doğrudan etiket↔segment eşleme.
+Saf çekirdek (boyutlandırma, metraj, yuvarlama, kurallar, birim, CSV) AutoCAD'siz test edilebilir:
+```
+(load "test/run-all-tests.lsp")
+```
+Sonuç: `=== SONUC: N PASS, 0 FAIL ===`
+
+> ⚠️ **Mühendis kabul testi gerekli:** Havalandırma sürtünme katsayısı (`*hva-friction-k*`, `src/modules/havalandirma/hva-sizing.lsp`) yaklaşık bir bağıntıdır. Gerçek ductulator/nomogram sonuçlarıyla kalibre edilmelidir. Hız eşikleri ve sac kalınlığı tablosu da makine mühendisi onayı bekler.
+
+## Yol Haritası (sonraki sürümler)
+
+- Su / elektrik / yangın / ısı modülleri (her biri kendi domain araştırması + mühendis onayıyla)
+- Havalandırmada: dirsek/T/redüksiyon fitting hesabı, yuvarlak kanal, tüm-ağ basınç toplama, .xlsx çıktı
+- Lisanslama (ticarileşme aşaması)
+- AutoCAD menü/ribbon
 
 ## Lisans
 
